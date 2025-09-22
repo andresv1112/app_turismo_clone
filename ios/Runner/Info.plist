@@ -43,7 +43,13 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
+        <key>UIApplicationSupportsIndirectInputEvents</key>
+        <true/>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>Necesitamos acceder a tu ubicación para mostrar tu posición en el mapa y enviar alertas de seguridad.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>La app utiliza tu ubicación para avisarte cuando ingresas a zonas con riesgos potenciales.</string>
+        <key>io.flutter.embedded_views_preview</key>
+        <true/>
 </dict>
 </plist>
