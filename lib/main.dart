@@ -468,42 +468,23 @@ class RutasSegurasPage extends StatefulWidget {
 class _RutasSegurasPageState extends State<RutasSegurasPage> {
   static const List<SafeRoute> _defaultRoutes = <SafeRoute>[
     SafeRoute(
-      name: 'Ruta del Centro Histórico',
-      duration: '2 h 30 min',
-      difficulty: 'Fácil',
+      name: 'Vereda Buenavista',
+      duration: 'A 15 minutos de Villavicencio',
+      difficulty: 'Actividades para todos',
       description:
-          'Recorrido a pie por los principales hitos históricos y culturales de la ciudad.',
+          '🍃 La vereda Buenavista ofrece un clima distinto en Villavicencio, a tan solo '
+          '15 minutos de su casco urbano, ideal para el turismo deportivo, de naturaleza '
+          'y religioso.',
       pointsOfInterest: <String>[
-        'Plaza Central',
-        'Museo Regional',
-        'Pasaje de los Artesanos',
-      ],
-    ),
-    SafeRoute(
-      name: 'Sendero Ecológico Río Claro',
-      duration: '3 h',
-      difficulty: 'Intermedio',
-      description:
-          'Caminata guiada por el cauce del río con estaciones para observar flora y fauna.',
-      pointsOfInterest: <String>[
-        'Mirador de aves',
-        'Cascada Esmeralda',
-        'Centro de Interpretación Ambiental',
-      ],
-    ),
-    SafeRoute(
-      name: 'Cicloruta Metropolitana',
-      duration: '1 h 45 min',
-      difficulty: 'Fácil',
-      description:
-          'Ruta en bicicleta por las principales avenidas con puntos de hidratación y asistencia mecánica.',
-      pointsOfInterest: <String>[
-        'Parque Lineal del Norte',
-        'Plazoleta de la Cultura',
-        'Bulevar Gastronómico',
+        'Miradores',
+        'Parapente',
+        'Caminata ecológica',
       ],
     ),
   ];
+
+  static const LatLng _veredaBuenavistaLocation =
+      LatLng(4.157296670026874, -73.68158509824853);
 
   final SafeRouteLocalDataSource _localDataSource = SafeRouteLocalDataSource();
   List<SafeRoute> _routes = const <SafeRoute>[];
@@ -516,34 +497,28 @@ class _RutasSegurasPageState extends State<RutasSegurasPage> {
   }
 
   Future<void> _initializeRoutes() async {
-    final List<SafeRoute> cachedRoutes = await _localDataSource.loadRoutes();
+    await _localDataSource.saveRoutes(_defaultRoutes);
 
     if (!mounted) {
       return;
     }
 
-    if (cachedRoutes.isEmpty) {
-      await _localDataSource.saveRoutes(_defaultRoutes);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _routes = _defaultRoutes;
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _routes = cachedRoutes;
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _routes = _defaultRoutes;
+      _isLoading = false;
+    });
   }
 
-  void _showMapPlaceholder(SafeRoute route) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'La visualización en mapa para "${route.name}" estará disponible próximamente.',
+  Future<void> _openRouteOnMap(SafeRoute route) async {
+    if (!mounted) {
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => SafeRouteMapView(
+          routeName: route.name,
+          target: _veredaBuenavistaLocation,
         ),
       ),
     );
@@ -614,7 +589,7 @@ class _RutasSegurasPageState extends State<RutasSegurasPage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton.icon(
-                    onPressed: () => _showMapPlaceholder(route),
+                    onPressed: () => _openRouteOnMap(route),
                     icon: const Icon(Icons.map),
                     label: const Text('Ver en Mapa'),
                   ),
@@ -646,6 +621,38 @@ class _RouteInfo extends StatelessWidget {
         const SizedBox(width: 6),
         Text(label),
       ],
+    );
+  }
+}
+
+class SafeRouteMapView extends StatelessWidget {
+  const SafeRouteMapView({
+    super.key,
+    required this.routeName,
+    required this.target,
+  });
+
+  final String routeName;
+  final LatLng target;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(routeName),
+      ),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(target: target, zoom: 16),
+        markers: <Marker>{
+          Marker(
+            markerId: MarkerId(routeName),
+            position: target,
+            infoWindow: InfoWindow(title: routeName),
+          ),
+        },
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+      ),
     );
   }
 }
