@@ -166,11 +166,11 @@ class _MapaPageState extends State<MapaPage> {
       center: LatLng(4.1161999958575795, -73.6088337333233),
       title: 'Centro histórico de Villavicencio',
       description:
-          'Corredor comercial y peatonal con alta afluencia de visitantes, entidades financieras y comercio informal.',
+          'Actividades para realizar:\n- Senderismo / caminatas por la ruta Carmen → Buenavista.\n- Excursiones con subida “Buena Vista” como reto para ciclistas o deportistas de montaña.\n- Observación de paisaje, miradores — Buenavista y rutas anexas ofrecen vistas de la ciudad y del paisaje montañoso alrededor.\n- Turismo deportivo / actividades al aire libre — aprovechar el clima distinto, naturaleza más fresca que la ciudad.',
       specificDangers:
-          'Se reportan hurtos menores a transeúntes, motociclistas que irrumpen en las zonas peatonales y acumulación de puestos ambulantes que obstaculizan los puntos de evacuación al final de la tarde.',
+          'Precauciones en el sitio:\n- Mantenerse en los caminos señalados para evitar extravíos.\n- En temporada de lluvias, verificar si hay derrumbes o barro en las rutas.\n- La señal de celular es intermitente; buscar zonas altas para mejorar la cobertura.\n- No dejar pertenencias sin vigilancia durante caminatas o recorridos.\n- Tener presente que la presencia de policía o puestos de control en la zona es limitada.',
       securityRecommendations:
-          'Mantén tus objetos de valor seguros, evita manipular dinero en vía pública, recorre rutas iluminadas después del anochecer y coordina puntos de encuentro en lugares vigilados.',
+          'Recomendaciones ambientales:\n- No dejar basura en los caminos ni en zonas verdes.\n- Respetar los cultivos y propiedades privadas de la comunidad.\n- Evitar hacer ruido excesivo para no afectar la fauna del lugar.\n- No encender fogatas en sitios no autorizados.',
       radius: DangerZone.defaultRadius,
     ),
     DangerZone(
@@ -178,11 +178,11 @@ class _MapaPageState extends State<MapaPage> {
       center: LatLng(4.110716544734726, -73.62999691007467),
       title: 'Terminal de Transporte de Villavicencio',
       description:
-          'Nodo de conexión intermunicipal con flujo constante de pasajeros, vendedores informales y parqueaderos improvisados.',
+          'Actividades para realizar:\n- Senderismo / caminatas por la ruta Carmen → Buenavista.\n- Excursiones con subida “Buena Vista” como reto para ciclistas o deportistas de montaña.\n- Observación de paisaje, miradores — Buenavista y rutas anexas ofrecen vistas de la ciudad y del paisaje montañoso alrededor.\n- Turismo deportivo / actividades al aire libre — aprovechar el clima distinto, naturaleza más fresca que la ciudad.',
       specificDangers:
-          'Ocurren robos de equipaje durante el abordaje, ofertas de transporte no autorizado y maniobras continuas de buses y camiones en las bahías de espera.',
+          'Precauciones en el sitio:\n- Mantenerse en los caminos señalados para evitar extravíos.\n- En temporada de lluvias, verificar si hay derrumbes o barro en las rutas.\n- La señal de celular es intermitente; buscar zonas altas para mejorar la cobertura.\n- No dejar pertenencias sin vigilancia durante caminatas o recorridos.\n- Tener presente que la presencia de policía o puestos de control en la zona es limitada.',
       securityRecommendations:
-          'Compra tus tiquetes únicamente en puntos oficiales, permanece en áreas iluminadas mientras esperas, vigila tu equipaje en todo momento y utiliza servicios de transporte autorizados para tus desplazamientos.',
+          'Recomendaciones ambientales:\n- No dejar basura en los caminos ni en zonas verdes.\n- Respetar los cultivos y propiedades privadas de la comunidad.\n- Evitar hacer ruido excesivo para no afectar la fauna del lugar.\n- No encender fogatas en sitios no autorizados.',
       radius: DangerZone.defaultRadius,
     ),
   ];
