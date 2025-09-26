@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'models/report.dart';
 import 'models/safe_route.dart';
 import 'models/user_preferences.dart';
+import 'pages/parapente_detail_page.dart';
 import 'services/local_storage_service.dart';
 import 'services/location_service.dart';
 import 'services/safe_route_local_data_source.dart';
@@ -524,6 +525,23 @@ class _RutasSegurasPageState extends State<RutasSegurasPage> {
     );
   }
 
+  bool _routeHasParapente(SafeRoute route) {
+    return route.pointsOfInterest
+        .any((String point) => point.toLowerCase().contains('parapente'));
+  }
+
+  Future<void> _openParapenteDetails() async {
+    if (!mounted) {
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const ParapenteDetailPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -586,13 +604,23 @@ class _RutasSegurasPageState extends State<RutasSegurasPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FilledButton.icon(
-                    onPressed: () => _openRouteOnMap(route),
-                    icon: const Icon(Icons.map),
-                    label: const Text('Ver en Mapa'),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    if (_routeHasParapente(route)) ...<Widget>[
+                      OutlinedButton.icon(
+                        onPressed: _openParapenteDetails,
+                        icon: const Icon(Icons.airplanemode_active),
+                        label: const Text('Clima para Parapente'),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    FilledButton.icon(
+                      onPressed: () => _openRouteOnMap(route),
+                      icon: const Icon(Icons.map),
+                      label: const Text('Ver en Mapa'),
+                    ),
+                  ],
                 ),
               ],
             ),
