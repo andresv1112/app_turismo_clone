@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/ideam_weather.dart';
@@ -13,18 +15,48 @@ class ParapenteDetailPage extends StatefulWidget {
 class _ParapenteDetailPageState extends State<ParapenteDetailPage> {
   late final IdeamWeatherService _weatherService;
   late Future<IdeamWeather> _weatherFuture;
+  Timer? _weatherTimer;
+  bool _isAutoUpdating = false;
 
   @override
   void initState() {
     super.initState();
     _weatherService = IdeamWeatherService();
     _weatherFuture = _weatherService.fetchVillavicencioWeather();
+    _weatherTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+      _refreshWeather(showUpdatingIndicator: true);
+    });
   }
 
   @override
   void dispose() {
+    _weatherTimer?.cancel();
     _weatherService.dispose();
     super.dispose();
+  }
+
+  Future<IdeamWeather> _refreshWeather({bool showUpdatingIndicator = false}) {
+    final Future<IdeamWeather> newFuture =
+        _weatherService.fetchVillavicencioWeather();
+    setState(() {
+      _weatherFuture = newFuture;
+      if (showUpdatingIndicator) {
+        _isAutoUpdating = true;
+      }
+    });
+
+    if (showUpdatingIndicator) {
+      newFuture.whenComplete(() {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _isAutoUpdating = false;
+        });
+      });
+    }
+
+    return newFuture;
   }
 
   @override
@@ -44,75 +76,82 @@ class _ParapenteDetailPageState extends State<ParapenteDetailPage> {
             return _ErrorView(
               error: snapshot.error,
               onRetry: () {
-                setState(() {
-                  _weatherFuture = _weatherService.fetchVillavicencioWeather();
-                });
+                _refreshWeather();
               },
             );
           }
 
           final IdeamWeather weather = snapshot.requireData;
-          return RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _weatherFuture = _weatherService.fetchVillavicencioWeather();
-              });
-              await _weatherFuture;
-            },
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: <Widget>[
-                _WeatherHeader(weather: weather),
-                const SizedBox(height: 16),
-                _WeatherValueTile(
-                  icon: Icons.thermostat,
-                  label: 'Temperatura',
-                  value: weather.temperatureCelsius != null
-                      ? '${weather.temperatureCelsius!.toStringAsFixed(1)} °C'
-                      : 'No disponible',
+          return Stack(
+            children: <Widget>[
+              RefreshIndicator(
+                onRefresh: () async {
+                  await _refreshWeather();
+                },
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: <Widget>[
+                    _WeatherHeader(weather: weather),
+                    const SizedBox(height: 16),
+                    _WeatherValueTile(
+                      icon: Icons.thermostat,
+                      label: 'Temperatura',
+                      value: weather.temperatureCelsius != null
+                          ? '${weather.temperatureCelsius!.toStringAsFixed(1)} °C'
+                          : 'No disponible',
+                    ),
+                    _WeatherValueTile(
+                      icon: Icons.water_drop,
+                      label: 'Humedad relativa',
+                      value: weather.humidityPercentage != null
+                          ? '${weather.humidityPercentage!.toStringAsFixed(0)} %'
+                          : 'No disponible',
+                    ),
+                    _WeatherValueTile(
+                      icon: Icons.air,
+                      label: 'Velocidad del viento',
+                      value: weather.windSpeedKmh != null
+                          ? '${weather.windSpeedKmh!.toStringAsFixed(1)} km/h'
+                          : 'No disponible',
+                    ),
+                    if (weather.windDirection != null)
+                      _WeatherValueTile(
+                        icon: Icons.explore,
+                        label: 'Dirección del viento',
+                        value: weather.windDirection!,
+                      ),
+                    _WeatherValueTile(
+                      icon: Icons.speed,
+                      label: 'Presión atmosférica',
+                      value: weather.pressureHpa != null
+                          ? '${weather.pressureHpa!.toStringAsFixed(0)} hPa'
+                          : 'No disponible',
+                    ),
+                    _WeatherValueTile(
+                      icon: Icons.grain,
+                      label: 'Precipitación',
+                      value: weather.precipitationMm != null
+                          ? '${weather.precipitationMm!.toStringAsFixed(1)} mm'
+                          : 'No disponible',
+                    ),
+                    if (weather.feelsLikeCelsius != null)
+                      _WeatherValueTile(
+                        icon: Icons.local_fire_department,
+                        label: 'Sensación térmica',
+                        value:
+                            '${weather.feelsLikeCelsius!.toStringAsFixed(1)} °C',
+                      ),
+                  ],
                 ),
-                _WeatherValueTile(
-                  icon: Icons.water_drop,
-                  label: 'Humedad relativa',
-                  value: weather.humidityPercentage != null
-                      ? '${weather.humidityPercentage!.toStringAsFixed(0)} %'
-                      : 'No disponible',
+              ),
+              if (_isAutoUpdating)
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  child: LinearProgressIndicator(),
                 ),
-                _WeatherValueTile(
-                  icon: Icons.air,
-                  label: 'Velocidad del viento',
-                  value: weather.windSpeedKmh != null
-                      ? '${weather.windSpeedKmh!.toStringAsFixed(1)} km/h'
-                      : 'No disponible',
-                ),
-                if (weather.windDirection != null)
-                  _WeatherValueTile(
-                    icon: Icons.explore,
-                    label: 'Dirección del viento',
-                    value: weather.windDirection!,
-                  ),
-                _WeatherValueTile(
-                  icon: Icons.speed,
-                  label: 'Presión atmosférica',
-                  value: weather.pressureHpa != null
-                      ? '${weather.pressureHpa!.toStringAsFixed(0)} hPa'
-                      : 'No disponible',
-                ),
-                _WeatherValueTile(
-                  icon: Icons.grain,
-                  label: 'Precipitación',
-                  value: weather.precipitationMm != null
-                      ? '${weather.precipitationMm!.toStringAsFixed(1)} mm'
-                      : 'No disponible',
-                ),
-                if (weather.feelsLikeCelsius != null)
-                  _WeatherValueTile(
-                    icon: Icons.local_fire_department,
-                    label: 'Sensación térmica',
-                    value: '${weather.feelsLikeCelsius!.toStringAsFixed(1)} °C',
-                  ),
-              ],
-            ),
+            ],
           );
         },
       ),
